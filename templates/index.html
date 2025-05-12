@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Analytics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="clouds"></div>
+    
+    <div class="container">
+        <div class="upload-container">
+            <div class="glow-effect">
+                <h1 class="title">Student Analytics <span class="highlight">Dashboard</span></h1>
+                <div class="upload-card">
+                    <div class="card-content">
+                        <div class="upload-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h2>Upload Student Data</h2>
+                        <p>Upload your Excel or CSV file with student results to visualize beautiful analytics</p>
+                        
+                        {% if error %}
+                        <div class="error-message">
+                            <p>{{ error }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+                            <div class="file-input-container">
+                                <input type="file" name="file" id="file" class="file-input" accept=".csv, .xlsx">
+                                <label for="file" class="file-label">
+                                    <i class="fas fa-file-upload"></i>
+                                    <span>Choose a file</span>
+                                </label>
+                                <span class="file-name">No file selected</span>
+                            </div>
+                            <button type="submit" class="upload-button">
+                                <span>Analyze Data</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h3>Interactive 3D Visualizations</h3>
+                        <p>Explore student data through stunning 3D charts and graphs</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>Student Performance Analysis</h3>
+                        <p>Detailed insights into individual student performance</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Subject-wise Analytics</h3>
+                        <p>Compare performance across different subjects</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

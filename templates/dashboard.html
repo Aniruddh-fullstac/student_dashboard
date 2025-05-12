@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Analytics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three-orbit-controls@82.1.0/index.min.js"></script>
+</head>
+<body class="dashboard-body">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="logo">
+                <i class="fas fa-chart-network"></i>
+                <h1>Student Analytics <span class="highlight">Dashboard</span></h1>
+            </div>
+            <nav>
+                <a href="#overview" class="active"><i class="fas fa-home"></i> Overview</a>
+                <a href="#subject-analysis"><i class="fas fa-book"></i> Subject Analysis</a>
+                <a href="#student-analysis"><i class="fas fa-user-graduate"></i> Student Analysis</a>
+                <a href="#correlations"><i class="fas fa-project-diagram"></i> Correlations</a>
+                <a href="/"><i class="fas fa-upload"></i> Upload New Data</a>
+            </nav>
+        </header>
+        
+        <main class="dashboard-content">
+            <section id="overview" class="dashboard-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-tachometer-alt"></i> Performance Overview</h2>
+                    <p>Analyzing data for <span class="highlight">{{ total_students }}</span> students</p>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Students</h3>
+                            <p class="stat-value">{{ total_students }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Top Performer</h3>
+                            <p class="stat-value" id="top-performer-name">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Average Score</h3>
+                            <p class="stat-value" id="overall-average">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Best Subject</h3>
+                            <p class="stat-value" id="best-subject">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card full-width">
+                        <h3>Overall Performance Distribution</h3>
+                        <div id="overall-distribution-chart" class="chart"></div>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Subject Averages</h3>
+                        <div id="subject-averages-chart" class="chart"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Top 10 Students</h3>
+                        <div id="top-students-chart" class="chart"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="subject-analysis" class="dashboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-book"></i> Subject Analysis</h2>
+                    <p>Detailed performance metrics for each subject</p>
+                </div>
+                
+                <div class="subject-selector">
+                    <label for="subject-select">Select Subject:</label>
+                    <select id="subject-select">
+                        {% for subject in subjects %}
+                        <option value="{{ subject }}">{{ subject }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Score Distribution</h3>
+                        <div id="subject-distribution-chart" class="chart"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Performance Metrics</h3>
+                        <div id="subject-metrics-chart" class="chart"></div>
+                    </div>
+                    
+                    <div class="chart-card full-width">
+                        <h3>3D Score Landscape</h3>
+                        <div id="subject-3d-landscape" class="chart chart-3d"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="student-analysis" class="dashboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-graduate"></i> Student Analysis</h2>
+                    <p>Individual student performance insights</p>
+                </div>
+                
+                <div class="student-search">
+                    <div class="search-container">
+                        <select id="student-dropdown" class="student-dropdown">
+                            <option value="">Select a student...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="student-profile">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="student-name">Select a student</h3>
+                            <p id="student-id"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Subject Performance</h3>
+                            <div id="student-radar-chart" class="chart"></div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3>Performance vs Class Average</h3>
+                            <div id="student-comparison-chart" class="chart"></div>
+                        </div>
+                        
+                        <div class="chart-card full-width">
+                            <h3>3D Performance Visualization</h3>
+                            <div id="student-3d-chart" class="chart chart-3d"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="correlations" class="dashboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-project-diagram"></i> Subject Correlations</h2>
+                    <p>Discover relationships between different subjects</p>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card full-width">
+                        <h3>Correlation Matrix</h3>
+                        <div id="correlation-matrix-chart" class="chart"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Subject Pair Analysis</h3>
+                        <div class="subject-pair-selector">
+                            <div>
+                                <label for="subject-x">Subject X:</label>
+                                <select id="subject-x">
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="subject-y">Subject Y:</label>
+                                <select id="subject-y">
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="subject-scatter-chart" class="chart"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>3D Correlation Visualization</h3>
+                        <div class="subject-trio-selector">
+                            <div>
+                                <label for="subject-x-3d">X Axis:</label>
+                                <select id="subject-x-3d">
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="subject-y-3d">Y Axis:</label>
+                                <select id="subject-y-3d">
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="subject-z-3d">Z Axis:</label>
+                                <select id="subject-z-3d">
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject }}">{{ subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="correlation-3d-chart" class="chart chart-3d"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
